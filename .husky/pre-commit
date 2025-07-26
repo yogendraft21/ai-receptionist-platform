@@ -1,1 +1,97 @@
-npm test
+#!/bin/sh
+echo "🔍 Running pre-commit hooks..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Function to run commands in specific workspace
+run_in_workspace() {
+    local workspace=$1
+    local command=$2
+    
+    if [ -d "apps/$workspace" ]; then
+        echo "📁 Running in apps/$workspace: $command"
+        cd "apps/$workspace"
+        eval $command
+        RESULT=$?
+        cd ../..
+        if [ $RESULT -ne 0 ]; then
+            echo "❌ Command failed in $workspace"
+            exit 1
+        fi
+    fi
+}
+
+# Function to run in packages
+run_in_package() {
+    local package=$1
+    local command=$2
+    
+    if [ -d "packages/$package" ]; then
+        echo "📦 Running in packages/$package: $command"
+        cd "packages/$package"
+        eval $command
+        RESULT=$?
+        cd ../..
+        if [ $RESULT -ne 0 ]; then
+            echo "❌ Command failed in $package"
+            exit 1
+        fi
+    fi
+}
+
+# Check which apps/packages have staged files and run appropriate commands
+for file in $STAGED_FILES; do
+    case $file in
+        apps/frontend/*)
+            if [ -z "$FRONTEND_CHECKED" ]; then
+                echo "🎯 Found changes in frontend..."
+                run_in_workspace "frontend" "npm run lint:fix"
+                run_in_workspace "frontend" "npm run format"
+                run_in_workspace "frontend" "npm run type-check"
+                FRONTEND_CHECKED=true
+            fi
+            ;;
+        apps/api-server/*)
+            if [ -z "$API_SERVER_CHECKED" ]; then
+                echo "🎯 Found changes in api-server..."
+                run_in_workspace "api-server" "npm run lint:fix"
+                run_in_workspace "api-server" "npm run format"
+                run_in_workspace "api-server" "npm run type-check"
+                API_SERVER_CHECKED=true
+            fi
+            ;;
+        apps/ai-engine/*)
+            if [ -z "$AI_ENGINE_CHECKED" ]; then
+                echo "🎯 Found changes in ai-engine..."
+                run_in_workspace "ai-engine" "npm run lint:fix"
+                run_in_workspace "ai-engine" "npm run format"
+                run_in_workspace "ai-engine" "npm run type-check"
+                AI_ENGINE_CHECKED=true
+            fi
+            ;;
+        packages/shared-types/*)
+            if [ -z "$SHARED_TYPES_CHECKED" ]; then
+                echo "🎯 Found changes in shared-types..."
+                run_in_package "shared-types" "npm run lint:fix"
+                run_in_package "shared-types" "npm run format"
+                run_in_package "shared-types" "npm run build"
+                SHARED_TYPES_CHECKED=true
+            fi
+            ;;
+        packages/shared-utils/*)
+            if [ -z "$SHARED_UTILS_CHECKED" ]; then
+                echo "🎯 Found changes in shared-utils..."
+                run_in_package "shared-utils" "npm run lint:fix"
+                run_in_package "shared-utils" "npm run format"
+                run_in_package "shared-utils" "npm run build"
+                SHARED_UTILS_CHECKED=true
+            fi
+            ;;
+    esac
+done
+
+# Stage the fixed files
+git add $STAGED_FILES
+
+echo "✅ Pre-commit checks passed!"

@@ -6,11 +6,14 @@
   "files": [
     "dist"
   ],
-  "scripts": {
+   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rmdir /s /q dist 2>nul || echo dist folder cleaned",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rmdir /s /q dist 2>nul || echo dist folder cleaned"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

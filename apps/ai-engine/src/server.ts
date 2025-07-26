@@ -13,7 +13,7 @@ const PORT = process.env.AI_ENGINE_PORT || 5000;
 // Initialize AI clients
 const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || ''
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 // Middleware
@@ -30,9 +30,9 @@ app.get('/health', (req, res) => {
       environment: process.env.NODE_ENV || 'development',
       aiProviders: {
         gemini: !!process.env.GEMINI_API_KEY,
-        openai: !!process.env.OPENAI_API_KEY
-      }
-    }
+        openai: !!process.env.OPENAI_API_KEY,
+      },
+    },
   };
   res.json(response);
 });
@@ -41,19 +41,21 @@ app.get('/health', (req, res) => {
 app.post('/test-ai', async (req, res) => {
   try {
     const { message } = req.body;
-    
+
     // Try Gemini first
     let aiResponse;
     let provider = 'gemini';
-    
+
     try {
       const model = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      const result = await model.generateContent(message || 'Hello, test message');
+      const result = await model.generateContent(
+        message || 'Hello, test message'
+      );
       const response = await result.response;
       aiResponse = response.text();
     } catch (geminiError) {
       console.log('Gemini failed, falling back to OpenAI:', geminiError);
-      
+
       // Fallback to OpenAI
       const completion = await openai.chat.completions.create({
         messages: [{ role: 'user', content: message || 'Hello, test message' }],
@@ -69,8 +71,8 @@ app.post('/test-ai', async (req, res) => {
       data: {
         provider,
         aiResponse,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
     res.json(response);
   } catch (error) {
@@ -78,7 +80,7 @@ app.post('/test-ai', async (req, res) => {
     const response: ApiResponse = {
       success: false,
       error: 'AI test failed',
-      message: 'Both AI providers failed'
+      message: 'Both AI providers failed',
     };
     res.status(500).json(response);
   }
@@ -87,23 +89,30 @@ app.post('/test-ai', async (req, res) => {
 // WhatsApp webhook (placeholder for now)
 app.post('/webhook/whatsapp', (req, res) => {
   console.log('WhatsApp webhook received:', req.body);
-  
+
   const response: ApiResponse = {
     success: true,
-    message: 'WhatsApp webhook processed'
+    message: 'WhatsApp webhook processed',
   };
   res.json(response);
 });
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  const response: ApiResponse = {
-    success: false,
-    error: 'Internal Server Error'
-  };
-  res.status(500).json(response);
-});
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Internal Server Error',
+    };
+    res.status(500).json(response);
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`🤖 AI Engine running on http://localhost:${PORT}`);

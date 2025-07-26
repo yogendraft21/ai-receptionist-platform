@@ -26,8 +26,8 @@ app.get('/health', (req, res) => {
     data: {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development'
-    }
+      environment: process.env.NODE_ENV || 'development',
+    },
   };
   res.json(response);
 });
@@ -40,8 +40,8 @@ app.get('/test', (req, res) => {
     message: 'Shared packages working',
     data: {
       emailValid: validateEmail(email),
-      endpoints: API_ENDPOINTS
-    }
+      endpoints: API_ENDPOINTS,
+    },
   };
   res.json(response);
 });
@@ -56,14 +56,21 @@ app.get(API_ENDPOINTS.AGENTS, (req, res) => {
 });
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  const response: ApiResponse = {
-    success: false,
-    error: 'Internal Server Error'
-  };
-  res.status(500).json(response);
-});
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Internal Server Error',
+    };
+    res.status(500).json(response);
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`🚀 API Server running on http://localhost:${PORT}`);
