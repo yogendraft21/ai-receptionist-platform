@@ -1,5 +1,0 @@
-{
-  "buildCommand": "npm run build --filter=shared-types --filter=shared-utils --filter=frontend",
-  "outputDirectory": "apps/frontend/dist",
-  "installCommand": "npm install"
-}
