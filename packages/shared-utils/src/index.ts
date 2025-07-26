@@ -12,11 +12,11 @@ export const API_ENDPOINTS = {
   AUTH: '/api/auth',
   USERS: '/api/users',
   AGENTS: '/api/agents',
-  CONVERSATIONS: '/api/conversations'
+  CONVERSATIONS: '/api/conversations',
 } as const;
 
 // Test Config
 export const TEST_CONFIG = {
   APP_NAME: 'AI Receptionist',
-  VERSION: '1.0.0'
+  VERSION: '1.0.0',
 } as const;

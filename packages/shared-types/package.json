@@ -6,7 +6,7 @@
   "files": [
     "dist"
   ],
-   "scripts": {
+  "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
