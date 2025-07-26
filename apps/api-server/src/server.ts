@@ -9,7 +9,7 @@ import type { ApiResponse, User } from '@platform/shared-types';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.API_SERVER_PORT || 4000;
+const PORT = Number(process.env.API_SERVER_PORT) || 4000;
 
 // Middleware
 app.use(helmet());
@@ -72,8 +72,8 @@ app.use(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`🚀 API Server running on http://localhost:${PORT}`);
-  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
-  console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 API Server running on http://0.0.0.0:${PORT}`);
+  console.log(`🔍 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`🧪 Test endpoint: http://0.0.0.0:${PORT}/test`);
 });
